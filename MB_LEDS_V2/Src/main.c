@@ -53,7 +53,10 @@ TIM_HandleTypeDef htim11;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-
+#define PERIOD 255
+#define RED 0
+#define GREEN 1
+#define BLUE 2
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -71,7 +74,42 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
+/**
+  * @brief  Deze functie bepaald de PWM waarde van de pin op het ledje.
+  * @param  bits is de data die bestaat uit een 8-bit kleur.
+  * @param  kleur geeft aan of de pin aan R G of B zit
+  *          This parameter can be one of the following values:
+  *            @arg RED: 	Pin bij het rode ledje
+  *            @arg GREEN: 	Pin bij het groene ledje
+  *            @arg BLUE: 	Pin bij het blauw ledje
+  * @retval HAL status
+  */
+uint8_t get_value(unsigned int bits, uint8_t kleur)
+{
+	switch(kleur)
+	{
+	case RED://rood
+		bits = bits>>16;
+		break;
+	case GREEN://groen
+		bits = bits>>8;
+		break;
+	case BLUE://blauw
+		break;
+	default:
+		return 0;
+		break;
+	}
 
+	return PERIOD/0xFF * (bits &= 0xFF);
+}
+
+void color_led(unsigned int data)
+{
+	  htim3.Instance->CCR1 = get_value(data, RED);		//R
+	  htim3.Instance->CCR4 = get_value(data, GREEN);		//B
+	  htim3.Instance->CCR2 = get_value(data, BLUE);	//G
+}
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
@@ -114,7 +152,16 @@ int main(void)
   MX_TIM10_Init();
   MX_TIM11_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_TIM_Base_Start_IT(&htim6);
+  HAL_TIM_Base_Start_IT(&htim7);
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_4);
+  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim10, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim11, TIM_CHANNEL_1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
