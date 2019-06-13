@@ -40,7 +40,7 @@
 #include "stm32f4xx_hal.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "math.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -110,6 +110,18 @@ void color_led(unsigned int data)
 	  htim3.Instance->CCR4 = get_value(data, GREEN);		//B
 	  htim3.Instance->CCR2 = get_value(data, BLUE);	//G
 }
+
+void wave()
+{
+	uint8_t teller = 0;
+	while(teller<24)
+	{
+		color_led(pow(2,teller));
+		HAL_Delay(50);
+		teller++;
+	}
+	teller = 0;
+}
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
@@ -166,8 +178,15 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  int test = 0;
   while (1)
   {
+	  /*if(test > 16777215)
+		  test = 0;
+	  color_led(0xef1f00);
+	  HAL_Delay(1);
+	  test++;*/
+	  wave();
 
   /* USER CODE END WHILE */
 
